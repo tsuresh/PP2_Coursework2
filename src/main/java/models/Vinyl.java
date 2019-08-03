@@ -3,28 +3,24 @@ package models;
 import java.util.Objects;
 
 public class Vinyl extends MusicItem {
-    private float speed, diameter;
+    private double speed, diameter;
 
-    public Vinyl(String itemID, String title, String genre, String artist, Date releaseDate, double price, float speed, float diameter) {
-        super(itemID, title, genre, artist, releaseDate, price);
-        setSpeed(speed);
-        setDiameter(diameter);
+    public Vinyl() {
+        super();
     }
 
-    public float getSpeed() {
+    public Vinyl(String itemID, String title, String genre, String artist, Date releaseDate, double price, ItemTypes itemType, double speed, double diameter) {
+        super(itemID, title, genre, artist, releaseDate, price, itemType);
+        this.speed = speed;
+        this.diameter = diameter;
+    }
+
+    public double getSpeed() {
         return speed;
     }
 
-    private void setSpeed(float speed) {
-        this.speed = speed;
-    }
-
-    public float getDiameter() {
+    public double getDiameter() {
         return diameter;
-    }
-
-    private void setDiameter(float diameter) {
-        this.diameter = diameter;
     }
 
     @Override
@@ -32,8 +28,8 @@ public class Vinyl extends MusicItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Vinyl vinyl = (Vinyl) o;
-        return Float.compare(vinyl.speed, speed) == 0 &&
-                Float.compare(vinyl.diameter, diameter) == 0;
+        return Double.compare(vinyl.speed, speed) == 0 &&
+                Double.compare(vinyl.diameter, diameter) == 0;
     }
 
     @Override
@@ -46,6 +42,13 @@ public class Vinyl extends MusicItem {
         return "Vinyl{" +
                 "speed=" + speed +
                 ", diameter=" + diameter +
+                ", itemID='" + itemID + '\'' +
+                ", title='" + title + '\'' +
+                ", genre='" + genre + '\'' +
+                ", artist='" + artist + '\'' +
+                ", releaseDate=" + releaseDate +
+                ", price=" + price +
+                ", itemType=" + itemType +
                 '}';
     }
 }

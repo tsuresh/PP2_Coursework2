@@ -6,6 +6,9 @@ public class Time {
 
     private int seconds, minutes, hours;
 
+    public Time() {
+    }
+
     public Time(int seconds, int minutes, int hours) {
         setSeconds(seconds);
         setMinutes(minutes);
@@ -61,11 +64,7 @@ public class Time {
 
     @Override
     public String toString() {
-        return "Time{" +
-                "seconds=" + seconds +
-                ", minutes=" + minutes +
-                ", hours=" + hours +
-                '}';
+        return hours + ":" + minutes + ":" + seconds;
     }
 
 }

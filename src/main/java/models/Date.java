@@ -6,6 +6,9 @@ public class Date {
 
     private int year, month, day;
 
+    public Date() {
+    }
+
     public Date(int year, int month, int day) {
         setYear(year);
         setMonth(month);
@@ -47,10 +50,6 @@ public class Date {
         } else {
             throw new IllegalArgumentException("Invalid day");
         }
-    }
-
-    public String getDate(){
-        return getDay()+"-"+getMonth()+"-"+getYear();
     }
 
     @Override

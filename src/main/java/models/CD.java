@@ -6,8 +6,12 @@ public class CD extends MusicItem {
 
     private Time duration;
 
-    public CD(String itemID, String title, String genre, String artist, Date releaseDate, double price, Time duration) {
-        super(itemID, title, genre, artist, releaseDate, price);
+    public CD() {
+        super();
+    }
+
+    public CD(String itemID, String title, String genre, String artist, Date releaseDate, double price, ItemTypes itemType, Time duration) {
+        super(itemID, title, genre, artist, releaseDate, price, itemType);
         this.duration = duration;
     }
 
@@ -32,6 +36,13 @@ public class CD extends MusicItem {
     public String toString() {
         return "CD{" +
                 "duration=" + duration +
+                ", itemID='" + itemID + '\'' +
+                ", title='" + title + '\'' +
+                ", genre='" + genre + '\'' +
+                ", artist='" + artist + '\'' +
+                ", releaseDate=" + releaseDate +
+                ", price=" + price +
+                ", itemType=" + itemType +
                 '}';
     }
 }

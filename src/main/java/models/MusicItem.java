@@ -1,19 +1,24 @@
 package models;
 
-public abstract class MusicItem implements Comparable<MusicItem> {
+public abstract class MusicItem {
 
     protected String itemID;
     protected String title, genre, artist;
     protected Date releaseDate;
     protected double price;
+    protected ItemTypes itemType;
 
-    public MusicItem(String itemID, String title, String genre, String artist, Date releaseDate, double price) {
+    public MusicItem() {
+    }
+
+    public MusicItem(String itemID, String title, String genre, String artist, Date releaseDate, double price, ItemTypes itemType) {
         setItemID(itemID);
         setTitle(title);
         setGenre(genre);
         setArtist(artist);
         setReleaseDate(releaseDate);
         setPrice(price);
+        setItemType(itemType);
     }
 
     public String getItemID() {
@@ -64,15 +69,24 @@ public abstract class MusicItem implements Comparable<MusicItem> {
         this.price = price;
     }
 
+    public ItemTypes getItemType() {
+        return itemType;
+    }
+
+    private void setItemType(ItemTypes itemType) {
+        this.itemType = itemType;
+    }
+
     @Override
     public String toString() {
         return "MusicItem{" +
-                "itemID=" + itemID +
+                "itemID='" + itemID + '\'' +
                 ", title='" + title + '\'' +
                 ", genre='" + genre + '\'' +
                 ", artist='" + artist + '\'' +
                 ", releaseDate=" + releaseDate +
                 ", price=" + price +
+                ", itemType=" + itemType +
                 '}';
     }
 }
