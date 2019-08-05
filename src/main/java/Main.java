@@ -1,5 +1,5 @@
 import gui.StoreManagerGUI;
-import javafx.stage.Stage;
+import javafx.application.Application;
 import models.*;
 import util.InputHandeler;
 import util.WestminsterMusicStoreManager;
@@ -47,7 +47,7 @@ public class Main {
                 case 7:
                     launchGUI();
             }
-            System.out.println("");
+            System.out.println();
         } while (selectedOption != 8);
     }
 
@@ -79,7 +79,11 @@ public class Main {
             Time duration = InputHandeler.promtTimeInput(scanner);
 
             MusicItem newItem = new CD(itemID, itemTitle, itemGenre, itemArtist, itemReleaseDate, itemPrice, itemType, duration);
-            westminsterMusicStoreManager.addItem(newItem);
+            try {
+                westminsterMusicStoreManager.addItem(newItem);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
 
         } else if (itemType == ItemTypes.VINYL) {
 
@@ -90,7 +94,11 @@ public class Main {
             double diametre = InputHandeler.promtNumberInput(scanner);
 
             MusicItem newItem = new Vinyl(itemID, itemTitle, itemGenre, itemArtist, itemReleaseDate, itemPrice, itemType, speed, diametre);
-            westminsterMusicStoreManager.addItem(newItem);
+            try {
+                westminsterMusicStoreManager.addItem(newItem);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
 
         } else {
             System.out.println("Invalid item type");
@@ -100,23 +108,20 @@ public class Main {
     private static void deleteItem() {
         System.out.println("Enter the item ID to delete: ");
         String itemID = InputHandeler.promtStringInput(scanner);
-        if (westminsterMusicStoreManager.searchItem(itemID) != null) {
+
+        try {
             westminsterMusicStoreManager.deleteItem(westminsterMusicStoreManager.searchItem(itemID));
-        } else {
-            System.out.println("Given item not found!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
     private static void printList() {
-        System.out.printf("%-10s %5s %18s %n", "ItemID", "Type", "Title");
-        System.out.println("--------------------------------------");
-        for (MusicItem item : westminsterMusicStoreManager.getStoreItems()) {
-            System.out.printf("%-10s %s %30s %n", item.getItemID(), item.getItemType(), item.getTitle());
-        }
+        westminsterMusicStoreManager.printList();
     }
 
     private static void sortList() {
-        westminsterMusicStoreManager.sort(westminsterMusicStoreManager.getStoreItems());
+        westminsterMusicStoreManager.sort();
     }
 
     private static void buyItem() {
@@ -126,28 +131,19 @@ public class Main {
         System.out.println("Enter the item quantity: ");
         int quantity = InputHandeler.promtNumberInput(scanner);
 
-        if (westminsterMusicStoreManager.searchItem(itemID) != null) {
+        try {
             westminsterMusicStoreManager.buyItem(westminsterMusicStoreManager.searchItem(itemID), quantity);
-        } else {
-            System.out.println("Given item not found!");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
     private static void printReport() {
-        System.out.printf("%-25s %s %10s %10s %9s %n", "Title", "ItemID", "Price", "Date", "Time");
-        System.out.println("--------------------------------------------------------------------");
-        for (Sale item : westminsterMusicStoreManager.getBoughtItems()) {
-            System.out.printf("%-25s %s %15s %14s %8s %n", item.getTitle(), item.getItemID(), item.getPrice(), item.getPurchaseDate(), item.getPurchaseTime());
-        }
+        westminsterMusicStoreManager.generateReport();
     }
 
     private static void launchGUI() {
-        StoreManagerGUI gui = new StoreManagerGUI();
-        try {
-            gui.start(new Stage());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Application.launch(StoreManagerGUI.class);
     }
 
 }

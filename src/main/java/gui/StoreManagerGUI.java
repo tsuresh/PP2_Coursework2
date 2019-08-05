@@ -18,8 +18,9 @@ import util.WestminsterMusicStoreManager;
 public class StoreManagerGUI extends Application {
 
     private static WestminsterMusicStoreManager storeManager;
-    private Stage window;
-    private TableView<MusicItem> tableView;
+
+    private Stage mainStage;
+    private TableView<MusicItem> detailsDisplay;
     private TextField searchInput;
 
     public static void main(String[] args) {
@@ -28,8 +29,8 @@ public class StoreManagerGUI extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        window = primaryStage;
-        window.setTitle("Products display");
+        mainStage = primaryStage;
+        mainStage.setTitle("Music items showcase");
 
         storeManager = new WestminsterMusicStoreManager();
 
@@ -50,9 +51,9 @@ public class StoreManagerGUI extends Application {
         genreColumn.setMinWidth(200);
         genreColumn.setCellValueFactory(new PropertyValueFactory<MusicItem, String>("genre"));
 
-        tableView = new TableView<>();
-        tableView.setItems(getAllItems());
-        tableView.getColumns().addAll(itemNumberColumn, titleColumn, artistColumn, genreColumn);
+        detailsDisplay = new TableView<>();
+        detailsDisplay.setItems(getAllItems());
+        detailsDisplay.getColumns().addAll(itemNumberColumn, titleColumn, artistColumn, genreColumn);
 
         //Top label
         Label title = new Label();
@@ -93,21 +94,21 @@ public class StoreManagerGUI extends Application {
 
         //Overall wrapper
         VBox overallWrapper = new VBox();
-        overallWrapper.getChildren().addAll(topbarWrapper, tableView, bottomWrapper);
+        overallWrapper.getChildren().addAll(topbarWrapper, detailsDisplay, bottomWrapper);
 
         Scene scene = new Scene(overallWrapper);
-        window.setScene(scene);
-        window.setResizable(false);
-        window.show();
+        mainStage.setScene(scene);
+        mainStage.setResizable(false);
+        mainStage.show();
     }
 
     private void exitButtonClicked() {
-        window.close();
+        mainStage.close();
     }
 
     private void searchButtonClicked() {
         String searchQuery = searchInput.getText();
-        tableView.setItems(getSearchItems(searchQuery));
+        detailsDisplay.setItems(getSearchItems(searchQuery));
     }
 
     private ObservableList<MusicItem> getAllItems() {

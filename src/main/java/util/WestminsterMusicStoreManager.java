@@ -8,6 +8,7 @@ import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
+import exceptions.ItemIDTakenException;
 import exceptions.ItemNotFoundException;
 import exceptions.StoreFullException;
 import interfaces.StoreManager;
@@ -24,10 +25,10 @@ import java.util.concurrent.ExecutionException;
 
 public class WestminsterMusicStoreManager implements StoreManager {
 
+    private static List<MusicItem> storeItems = new ArrayList<MusicItem>();
     private static Firestore db;
-    private final int maxCount = 1000;
-    private List<MusicItem> storeItems = new ArrayList<MusicItem>();
-    private List<Sale> boughtItems = new ArrayList<Sale>();
+    private static List<Sale> boughtItems = new ArrayList<Sale>();
+    private final int MAX_COUNT = 1000;
 
     public WestminsterMusicStoreManager() {
         if (db == null) {
@@ -114,78 +115,69 @@ public class WestminsterMusicStoreManager implements StoreManager {
     }
 
     @Override
-    public void addItem(MusicItem item) {
-        if (storeItems.size() < maxCount) {
-            ApiFuture<WriteResult> future = db.collection(Constants.MUSIC_ITEMS).document(item.getItemID()).set(item);
-            try {
-                System.out.println("Successfully added item at : " + future.get().getUpdateTime());
-                storeItems.add(item);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
+    public void addItem(MusicItem item) throws ExecutionException, InterruptedException {
+        for (MusicItem storeItem : getStoreItems()) {
+            if (storeItem.getItemID().equals(item.getItemID())) {
+                throw new ItemIDTakenException("Item ID is already taken!!");
             }
+        }
+        if (storeItems.size() < MAX_COUNT) {
+            ApiFuture<WriteResult> insertFuture = db.collection(Constants.MUSIC_ITEMS).document(item.getItemID()).set(item);
+            storeItems.add(item);
+            System.out.println("Successfully added item at : " + insertFuture.get().getUpdateTime());
+            System.out.println("There are " + (MAX_COUNT - storeItems.size()) + " slots pending.");
         } else {
-            throw new StoreFullException("Music store cannot contain more than " + maxCount + " items");
+            throw new StoreFullException("Music store cannot contain more than " + MAX_COUNT + " items");
         }
     }
 
     @Override
-    public boolean deleteItem(MusicItem item) {
-        ApiFuture<WriteResult> future = db.collection(Constants.MUSIC_ITEMS).document(item.getItemID()).delete();
-        try {
+    public void deleteItem(MusicItem item) throws ExecutionException, InterruptedException {
+        if (storeItems.contains(item)) {
+            ApiFuture<WriteResult> future = db.collection(Constants.MUSIC_ITEMS).document(item.getItemID()).delete();
             System.out.println("Successfully deleted item at : " + future.get().getUpdateTime());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+            System.out.println("Deleted a " + item.getItemType());
+            storeItems.remove(item);
+        } else {
+            throw new ItemNotFoundException("Given item not found in store!!");
         }
-        return storeItems.remove(item);
     }
 
     @Override
     public void printList() {
-        for (MusicItem item : storeItems) {
-            if (item instanceof Vinyl) {
-                System.out.println(item);
-            }
-        }
-        for (MusicItem item : storeItems) {
-            if (item instanceof CD) {
-                System.out.println(item);
-            }
+        System.out.printf("%-10s %-10s %-30s %n", "ItemID", "Type", "Title");
+        System.out.println("--------------------------------------");
+        for (MusicItem item : getStoreItems()) {
+            System.out.printf("%-10s %-10s %-30s %n", item.getItemID(), item.getItemType(), item.getTitle());
         }
     }
 
     @Override
-    public void buyItem(MusicItem item, int quantity) {
+    public void buyItem(MusicItem item, int quantity) throws ExecutionException, InterruptedException {
         if (storeItems.contains(item)) {
             LocalDateTime now = LocalDateTime.now();
             Sale sale = new Sale(item.getTitle(), item.getItemID(), item.getPrice(), new Date(now.getYear(), now.getMonthValue(), now.getDayOfMonth()), new Time(now.getSecond(), now.getMinute(), now.getHour()), quantity);
             ApiFuture<WriteResult> future = db.collection(Constants.BOUGHT_ITEMS).document().set(sale);
-            try {
-                System.out.println("Successfully bought item at : " + future.get().getUpdateTime());
-                boughtItems.add(sale);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Successfully bought item at : " + future.get().getUpdateTime());
+            boughtItems.add(sale);
         } else {
             throw new ItemNotFoundException("Given store item is not found");
         }
     }
 
     @Override
-    public void sort(List<MusicItem> musicItems) {
-        Collections.sort(musicItems, new TitleComparator());
-        storeItems.clear();
-        storeItems = musicItems;
+    public void sort() {
+        Collections.sort(storeItems, new TitleComparator());
+        System.out.println("Successfully sorted list!!");
     }
 
     @Override
     public void generateReport() {
-
+        System.out.printf("%-30s %-15s %-15s %-20s %-15s %n", "Title", "ItemID", "Price", "Date", "Time");
+        System.out.println("------------------------------------------------------------------------------------------------");
+        for (Sale item : getBoughtItems()) {
+            System.out.printf("%-30s %-15s %-15s %-20s %-15s %n", item.getTitle(), item.getItemID(), item.getPrice(), item.getPurchaseDate(), item.getPurchaseTime());
+        }
     }
 
     @Override
