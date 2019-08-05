@@ -25,10 +25,10 @@ import java.util.concurrent.ExecutionException;
 
 public class WestminsterMusicStoreManager implements StoreManager {
 
+    private final int MAX_COUNT = 1000;
     private static List<MusicItem> storeItems = new ArrayList<MusicItem>();
     private static Firestore db;
     private static List<Sale> boughtItems = new ArrayList<Sale>();
-    private final int MAX_COUNT = 1000;
 
     public WestminsterMusicStoreManager() {
         if (db == null) {
@@ -44,6 +44,7 @@ public class WestminsterMusicStoreManager implements StoreManager {
         }
     }
 
+    //Firebase initialization
     private void initFirebase() throws IOException {
         FileInputStream serviceAccount = null;
         serviceAccount = new FileInputStream("pp2cwk2-firebase-adminsdk-jmpsw-8a4bf78092.json");
@@ -56,11 +57,13 @@ public class WestminsterMusicStoreManager implements StoreManager {
         db = FirestoreClient.getFirestore();
     }
 
+    //Sync both store items and bought items with database
     private void syncFull() {
         syncStoreItems();
         syncBoughtItems();
     }
 
+    //Sync store items
     private void syncStoreItems() {
         db.collection(Constants.MUSIC_ITEMS).listDocuments().forEach(docRef -> {
             ApiFuture<DocumentSnapshot> future = docRef.get();
@@ -84,6 +87,7 @@ public class WestminsterMusicStoreManager implements StoreManager {
         });
     }
 
+    //Sync bought items
     private void syncBoughtItems() {
         db.collection(Constants.BOUGHT_ITEMS).listDocuments().forEach(docRef -> {
             ApiFuture<DocumentSnapshot> future = docRef.get();
@@ -102,6 +106,7 @@ public class WestminsterMusicStoreManager implements StoreManager {
         });
     }
 
+    //Display menu
     public void displayMenu() {
         System.out.println("Please choose an option from the given options:\n");
         System.out.println("1)\tAdd new item");
@@ -114,6 +119,7 @@ public class WestminsterMusicStoreManager implements StoreManager {
         System.out.println("8)\tExit program");
     }
 
+    //Add new items
     @Override
     public void addItem(MusicItem item) throws ExecutionException, InterruptedException {
         for (MusicItem storeItem : getStoreItems()) {
@@ -131,6 +137,7 @@ public class WestminsterMusicStoreManager implements StoreManager {
         }
     }
 
+    //Delete existing items
     @Override
     public void deleteItem(MusicItem item) throws ExecutionException, InterruptedException {
         if (storeItems.contains(item)) {
@@ -143,6 +150,7 @@ public class WestminsterMusicStoreManager implements StoreManager {
         }
     }
 
+    //Print items list
     @Override
     public void printList() {
         System.out.printf("%-10s %-10s %-30s %n", "ItemID", "Type", "Title");
@@ -152,6 +160,7 @@ public class WestminsterMusicStoreManager implements StoreManager {
         }
     }
 
+    //Make a new purchase
     @Override
     public void buyItem(MusicItem item, int quantity) throws ExecutionException, InterruptedException {
         if (storeItems.contains(item)) {
@@ -165,12 +174,14 @@ public class WestminsterMusicStoreManager implements StoreManager {
         }
     }
 
+    //Sort item list
     @Override
     public void sort() {
         Collections.sort(storeItems, new TitleComparator());
         System.out.println("Successfully sorted list!!");
     }
 
+    //Generate a report with purchases
     @Override
     public void generateReport() {
         System.out.printf("%-30s %-15s %-15s %-20s %-15s %n", "Title", "ItemID", "Price", "Date", "Time");
@@ -180,6 +191,7 @@ public class WestminsterMusicStoreManager implements StoreManager {
         }
     }
 
+    //Search for an item with itemID
     @Override
     public MusicItem searchItem(String itemID) {
         for (MusicItem item : getStoreItems()) {
@@ -190,6 +202,7 @@ public class WestminsterMusicStoreManager implements StoreManager {
         return null;
     }
 
+    //Search for multiple items with itemID
     @Override
     public List<MusicItem> searchItems(String title) {
         List<MusicItem> items = new ArrayList<>();
@@ -201,15 +214,18 @@ public class WestminsterMusicStoreManager implements StoreManager {
         return items;
     }
 
+    //Returns the list of store items
     public List<MusicItem> getStoreItems() {
         return storeItems;
     }
 
+    //Returns the list of bought items
     public List<Sale> getBoughtItems() {
         return boughtItems;
     }
 }
 
+//Title comparator
 class TitleComparator implements Comparator<MusicItem> {
     @Override
     public int compare(MusicItem o1, MusicItem o2) {

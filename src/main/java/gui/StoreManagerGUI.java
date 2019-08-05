@@ -29,31 +29,32 @@ public class StoreManagerGUI extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        mainStage = primaryStage;
-        mainStage.setTitle("Music items showcase");
 
         storeManager = new WestminsterMusicStoreManager();
 
+        mainStage = primaryStage;
+        mainStage.setTitle("Music items showcase");
+
         //Table view
-        TableColumn<MusicItem, String> itemNumberColumn = new TableColumn<>("Number");
-        itemNumberColumn.setMinWidth(20);
-        itemNumberColumn.setCellValueFactory(new PropertyValueFactory<MusicItem, String>("itemID"));
+        TableColumn<MusicItem, String> itemIDClm = new TableColumn<>("ItemID");
+        itemIDClm.setCellValueFactory(new PropertyValueFactory<MusicItem, String>("itemID"));
+        itemIDClm.setMinWidth(10);
 
-        TableColumn<MusicItem, String> titleColumn = new TableColumn<>("Title");
-        titleColumn.setMinWidth(200);
-        titleColumn.setCellValueFactory(new PropertyValueFactory<MusicItem, String>("title"));
+        TableColumn<MusicItem, String> itemTitleClm = new TableColumn<>("Title");
+        itemTitleClm.setCellValueFactory(new PropertyValueFactory<MusicItem, String>("title"));
+        itemTitleClm.setMinWidth(230);
 
-        TableColumn<MusicItem, String> artistColumn = new TableColumn<>("Artist");
-        artistColumn.setMinWidth(200);
-        artistColumn.setCellValueFactory(new PropertyValueFactory<MusicItem, String>("artist"));
+        TableColumn<MusicItem, String> itemArtistClm = new TableColumn<>("Artist");
+        itemArtistClm.setCellValueFactory(new PropertyValueFactory<MusicItem, String>("artist"));
+        itemArtistClm.setMinWidth(150);
 
-        TableColumn<MusicItem, String> genreColumn = new TableColumn<>("Genre");
-        genreColumn.setMinWidth(200);
-        genreColumn.setCellValueFactory(new PropertyValueFactory<MusicItem, String>("genre"));
+        TableColumn<MusicItem, String> itemGenreClm = new TableColumn<>("Album Genre");
+        itemGenreClm.setCellValueFactory(new PropertyValueFactory<MusicItem, String>("genre"));
+        itemGenreClm.setMinWidth(100);
 
         detailsDisplay = new TableView<>();
-        detailsDisplay.setItems(getAllItems());
-        detailsDisplay.getColumns().addAll(itemNumberColumn, titleColumn, artistColumn, genreColumn);
+        detailsDisplay.setItems(getListItems());
+        detailsDisplay.getColumns().addAll(itemIDClm, itemTitleClm, itemArtistClm, itemGenreClm);
 
         //Top label
         Label title = new Label();
@@ -68,11 +69,11 @@ public class StoreManagerGUI extends Application {
 
         //Search button
         Button searchButton = new Button("Search");
-        searchButton.setOnAction(e -> searchButtonClicked());
+        searchButton.setOnAction(e -> performSearch());
 
         //Exit button
         Button exitButton = new Button("Exit Program");
-        exitButton.setOnAction(e -> exitButtonClicked());
+        exitButton.setOnAction(e -> closeWindow());
 
         //Search wrapper
         HBox searchWrapper = new HBox();
@@ -96,30 +97,35 @@ public class StoreManagerGUI extends Application {
         VBox overallWrapper = new VBox();
         overallWrapper.getChildren().addAll(topbarWrapper, detailsDisplay, bottomWrapper);
 
+        //Set scene
         Scene scene = new Scene(overallWrapper);
         mainStage.setScene(scene);
         mainStage.setResizable(false);
         mainStage.show();
     }
 
-    private void exitButtonClicked() {
-        mainStage.close();
-    }
-
-    private void searchButtonClicked() {
+    //Start the searching process
+    private void performSearch() {
         String searchQuery = searchInput.getText();
-        detailsDisplay.setItems(getSearchItems(searchQuery));
+        detailsDisplay.setItems(searchForItems(searchQuery));
     }
 
-    private ObservableList<MusicItem> getAllItems() {
+    //Add all items to list
+    private ObservableList<MusicItem> searchForItems(String query) {
+        ObservableList<MusicItem> items = FXCollections.observableArrayList();
+        items.addAll(storeManager.searchItems(query));
+        return items;
+    }
+
+    //Search for items and add to table
+    private ObservableList<MusicItem> getListItems() {
         ObservableList<MusicItem> items = FXCollections.observableArrayList();
         items.addAll(storeManager.getStoreItems());
         return items;
     }
 
-    private ObservableList<MusicItem> getSearchItems(String query) {
-        ObservableList<MusicItem> items = FXCollections.observableArrayList();
-        items.addAll(storeManager.searchItems(query));
-        return items;
+    //Close the window
+    private void closeWindow() {
+        mainStage.close();
     }
 }

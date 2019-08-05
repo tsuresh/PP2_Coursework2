@@ -17,14 +17,13 @@ public class Main {
         displayMenu();
     }
 
-
+    //Display meny and get user input
     private static void displayMenu() {
         int selectedOption = 0;
         do {
             westminsterMusicStoreManager.displayMenu();
             selectedOption = InputHandeler.promtNumberInput(scanner, 1, 8);
             WestminsterMusicStoreManager storeManager = new WestminsterMusicStoreManager();
-
             switch (selectedOption) {
                 case 1:
                     addItems();
@@ -51,6 +50,7 @@ public class Main {
         } while (selectedOption != 8);
     }
 
+    //Add new items
     private static void addItems() {
         System.out.println("Enter the item ID: ");
         String itemID = InputHandeler.promtStringInput(scanner);
@@ -73,6 +73,7 @@ public class Main {
         System.out.println("Enter the item type: (VINYL/CD)");
         ItemTypes itemType = ItemTypes.valueOf(InputHandeler.promtStringInput(scanner));
 
+        //Check for item type (CD/VINYL)
         if (itemType == ItemTypes.CD) {
 
             System.out.println("Enter the duration in following format (hh:mm:ss): ");
@@ -105,6 +106,7 @@ public class Main {
         }
     }
 
+    //Delete already added item
     private static void deleteItem() {
         System.out.println("Enter the item ID to delete: ");
         String itemID = InputHandeler.promtStringInput(scanner);
@@ -116,14 +118,17 @@ public class Main {
         }
     }
 
+    //Print the item list
     private static void printList() {
         westminsterMusicStoreManager.printList();
     }
 
+    //Sort the item list in acending order
     private static void sortList() {
         westminsterMusicStoreManager.sort();
     }
 
+    //Make a new purchase
     private static void buyItem() {
         System.out.println("Enter the item ID to purchase: ");
         String itemID = InputHandeler.promtStringInput(scanner);
@@ -138,10 +143,12 @@ public class Main {
         }
     }
 
+    //Print a report
     private static void printReport() {
         westminsterMusicStoreManager.generateReport();
     }
 
+    //Launch the GUI with product details
     private static void launchGUI() {
         Application.launch(StoreManagerGUI.class);
     }
